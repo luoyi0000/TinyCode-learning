@@ -1,0 +1,25 @@
+{"type":"run_started","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":1,"timestamp":1792752801666}
+{"type":"model_requested","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":2,"timestamp":1792752801670}
+{"type":"decision_made","decision":{"kind":"call_tool","toolCallId":"c1","intent":{"name":"list_files","arguments":{}}},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":3,"timestamp":1792752801671}
+{"type":"tool_started","toolCallId":"c1","toolName":"list_files","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":4,"timestamp":1792752801671}
+{"type":"tool_completed","toolCallId":"c1","toolName":"list_files","status":"success","result":["greeting.txt"],"durationMs":0,"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":5,"timestamp":1792752801671}
+{"type":"observation_added","name":"list_files","observation":{"toolCallId":"c1","name":"list_files","observedAt":1792752801671,"ok":true,"summary":"greeting.txt","data":["greeting.txt"]},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":6,"timestamp":1792752801671}
+{"type":"model_requested","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":7,"timestamp":1792752801675}
+{"type":"decision_made","decision":{"kind":"call_tool","toolCallId":"c2","intent":{"name":"read_file","arguments":{"path":"greeting.txt"}}},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":8,"timestamp":1792752801675}
+{"type":"tool_started","toolCallId":"c2","toolName":"read_file","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":9,"timestamp":1792752801675}
+{"type":"tool_completed","toolCallId":"c2","toolName":"read_file","status":"success","result":"old","durationMs":0,"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":10,"timestamp":1792752801675}
+{"type":"observation_added","name":"read_file","observation":{"toolCallId":"c2","name":"read_file","observedAt":1792752801675,"ok":true,"summary":"old","data":"old"},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":11,"timestamp":1792752801675}
+{"type":"model_requested","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":12,"timestamp":1792752801679}
+{"type":"decision_made","decision":{"kind":"call_tool","toolCallId":"c3","intent":{"name":"write_file","arguments":{"path":"greeting.txt","content":"hello tinycode"}}},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":13,"timestamp":1792752801679}
+{"type":"tool_started","toolCallId":"c3","toolName":"write_file","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":14,"timestamp":1792752801679}
+{"type":"tool_completed","toolCallId":"c3","toolName":"write_file","status":"success","result":null,"durationMs":0,"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":15,"timestamp":1792752801679}
+{"type":"observation_added","name":"write_file","observation":{"toolCallId":"c3","name":"write_file","observedAt":1792752801679,"ok":true,"summary":"wrote 14 chars to greeting.txt","data":null},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":16,"timestamp":1792752801679}
+{"type":"model_requested","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":17,"timestamp":1792752801681}
+{"type":"decision_made","decision":{"kind":"call_tool","toolCallId":"c4","intent":{"name":"run_check","arguments":{}}},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":18,"timestamp":1792752801681}
+{"type":"tool_started","toolCallId":"c4","toolName":"run_check","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":19,"timestamp":1792752801681}
+{"type":"tool_completed","toolCallId":"c4","toolName":"run_check","status":"success","result":{"command":"memory-check","passed":true,"output":"greeting.txt=\"hello tinycode\""},"durationMs":0,"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":20,"timestamp":1792752801681}
+{"type":"observation_added","name":"run_check","observation":{"toolCallId":"c4","name":"run_check","observedAt":1792752801681,"ok":true,"summary":"check passed: greeting.txt=\"hello tinycode\"","data":{"command":"memory-check","passed":true,"output":"greeting.txt=\"hello tinycode\""}},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":21,"timestamp":1792752801681}
+{"type":"model_requested","runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":22,"timestamp":1792752801683}
+{"type":"decision_made","decision":{"kind":"respond","content":"greeting.txt updated, check passes"},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":23,"timestamp":1792752801683}
+{"type":"usage_reported","usage":{"toolCalls":4,"durationMs":18},"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":24,"timestamp":1792752801684}
+{"type":"run_completed","status":"complete","result":"greeting.txt updated, check passes","missingMaterial":[],"runId":"4ce47542-552b-419a-b722-e3fe7bb4bfc7","sequence":25,"timestamp":1792752801683}

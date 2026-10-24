@@ -1,0 +1,27 @@
+{
+  "name": "tinycode",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A tiny coding agent: Core/Runtime separated, Pi Agent SDK behind ports",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "tsc --noEmit",
+    "demo": "node src/cli.ts demo",
+    "replay": "node src/cli.ts replay",
+    "serve": "node src/cli.ts serve",
+    "record": "node scripts/record.ts"
+  },
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "0.84.2",
+    "@earendil-works/pi-ai": "0.84.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^22.18.0"
+  }
+}

@@ -1,0 +1,10 @@
+{"type":"run_started","runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":1,"timestamp":1792752801687}
+{"type":"model_requested","runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":2,"timestamp":1792752801689}
+{"type":"decision_made","decision":{"kind":"call_tool","toolCallId":"c1","intent":{"name":"delete_everything","arguments":{"path":"/"}}},"runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":3,"timestamp":1792752801690}
+{"type":"tool_started","toolCallId":"c1","toolName":"delete_everything","runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":4,"timestamp":1792752801690}
+{"type":"tool_completed","toolCallId":"c1","toolName":"delete_everything","status":"error","error":{"code":"invalid_tool","message":"refused: 'delete_everything' is not in the tool allowlist"},"durationMs":0,"runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":5,"timestamp":1792752801690}
+{"type":"observation_added","name":"delete_everything","observation":{"toolCallId":"c1","name":"delete_everything","ok":false,"summary":"refused: 'delete_everything' is not in the tool allowlist","data":null,"observedAt":1792752801690},"runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":6,"timestamp":1792752801690}
+{"type":"model_requested","runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":7,"timestamp":1792752801692}
+{"type":"decision_made","decision":{"kind":"respond","content":"I cannot do that with the tools I have"},"runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":8,"timestamp":1792752801693}
+{"type":"usage_reported","usage":{"toolCalls":1,"durationMs":7},"runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":9,"timestamp":1792752801694}
+{"type":"run_completed","status":"partial","result":"I cannot do that with the tools I have","missingMaterial":["tool:delete_everything"],"runId":"abf6f772-1996-4982-b157-6551d4625fcb","sequence":10,"timestamp":1792752801694}

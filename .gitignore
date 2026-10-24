@@ -1,0 +1,16 @@
+node_modules/
+*.log
+
+# run artefacts (event logs, run records); fixtures live in transcripts/
+.tinycode/
+
+# Third-party / unrelated material that happens to live in this folder.
+# The repository must contain only the TinyCode project.
+pi-coding-agent-skill/
+ASu-skills-*/
+contributor-*/
+fullstack-desktop-skills/
+
+# editor / OS noise
+.DS_Store
+Thumbs.db

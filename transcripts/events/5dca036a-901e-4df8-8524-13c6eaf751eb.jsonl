@@ -1,0 +1,10 @@
+{"type":"run_started","runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":1,"timestamp":1792752801695}
+{"type":"model_requested","runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":2,"timestamp":1792752801697}
+{"type":"decision_made","decision":{"kind":"call_tool","toolCallId":"c1","intent":{"name":"run_check","arguments":{}}},"runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":3,"timestamp":1792752801698}
+{"type":"tool_started","toolCallId":"c1","toolName":"run_check","runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":4,"timestamp":1792752801698}
+{"type":"tool_completed","toolCallId":"c1","toolName":"run_check","status":"success","result":{"command":"memory-check","passed":false,"output":"greeting.txt=\"still-old\""},"durationMs":0,"runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":5,"timestamp":1792752801698}
+{"type":"observation_added","name":"run_check","observation":{"toolCallId":"c1","name":"run_check","observedAt":1792752801698,"ok":true,"summary":"check failed: greeting.txt=\"still-old\"","data":{"command":"memory-check","passed":false,"output":"greeting.txt=\"still-old\""}},"runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":6,"timestamp":1792752801698}
+{"type":"model_requested","runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":7,"timestamp":1792752801699}
+{"type":"decision_made","decision":{"kind":"respond","content":"the check is red and I could not fix it"},"runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":8,"timestamp":1792752801699}
+{"type":"usage_reported","usage":{"toolCalls":1,"durationMs":5},"runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":9,"timestamp":1792752801700}
+{"type":"run_completed","status":"partial","result":"the check is red and I could not fix it","missingMaterial":["check_failed:memory-check"],"runId":"5dca036a-901e-4df8-8524-13c6eaf751eb","sequence":10,"timestamp":1792752801700}

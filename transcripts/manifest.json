@@ -1,0 +1,115 @@
+[
+  {
+    "file": "happy",
+    "logFile": "events/4ce47542-552b-419a-b722-e3fe7bb4bfc7.jsonl",
+    "task": {
+      "id": "golden-happy",
+      "request": "Make greeting.txt contain exactly 'hello tinycode'",
+      "workspace": ".",
+      "checkCommand": "memory-check"
+    },
+    "events": 25,
+    "terminal": "completed",
+    "observations": [
+      {
+        "name": "list_files",
+        "ok": true
+      },
+      {
+        "name": "read_file",
+        "ok": true
+      },
+      {
+        "name": "write_file",
+        "ok": true
+      },
+      {
+        "name": "run_check",
+        "ok": true
+      }
+    ],
+    "filesChanged": [
+      "greeting.txt"
+    ],
+    "checkPassed": true,
+    "missingMaterial": []
+  },
+  {
+    "file": "refused-tool",
+    "logFile": "events/abf6f772-1996-4982-b157-6551d4625fcb.jsonl",
+    "task": {
+      "id": "golden-refused",
+      "request": "Make greeting.txt contain exactly 'hello tinycode'",
+      "workspace": ".",
+      "checkCommand": "memory-check"
+    },
+    "events": 10,
+    "terminal": "completed",
+    "observations": [
+      {
+        "name": "delete_everything",
+        "ok": false
+      }
+    ],
+    "filesChanged": [],
+    "checkPassed": null,
+    "missingMaterial": [
+      "tool:delete_everything"
+    ]
+  },
+  {
+    "file": "failed-check",
+    "logFile": "events/5dca036a-901e-4df8-8524-13c6eaf751eb.jsonl",
+    "task": {
+      "id": "golden-failed-check",
+      "request": "Make greeting.txt contain exactly 'hello tinycode'",
+      "workspace": ".",
+      "checkCommand": "memory-check-strict"
+    },
+    "events": 10,
+    "terminal": "completed",
+    "observations": [
+      {
+        "name": "run_check",
+        "ok": true
+      }
+    ],
+    "filesChanged": [],
+    "checkPassed": false,
+    "missingMaterial": [
+      "check_failed:memory-check"
+    ]
+  },
+  {
+    "file": "live-cloud-tool-loop",
+    "logFile": "events/0297f57f-6611-4c94-bef4-ff5694301233.jsonl",
+    "task": {
+      "id": "run-1792829910667",
+      "request": "Make greeting.txt contain exactly: hello tinycode. Read it first, then fix it, then run the check.",
+      "workspace": "C:\\Users\\18928\\OneDrive\\Desktop\\TinyCode\\sandbox",
+      "checkCommand": "node check.mjs"
+    },
+    "events": 20,
+    "terminal": "completed",
+    "observations": [
+      {
+        "name": "read_file",
+        "ok": true
+      },
+      {
+        "name": "write_file",
+        "ok": true
+      },
+      {
+        "name": "run_check",
+        "ok": true
+      }
+    ],
+    "filesChanged": [
+      "greeting.txt"
+    ],
+    "checkPassed": true,
+    "missingMaterial": [],
+    "source": "live run 0297f57f-6611-4c94-bef4-ff5694301233 (workspace C:\\Users\\18928\\OneDrive\\Desktop\\TinyCode\\sandbox)"
+  }
+]
