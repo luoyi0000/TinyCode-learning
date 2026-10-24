@@ -32,8 +32,12 @@ Task → Context → 模型决策 → 工具动作 → Observation → 状态更
 npm install
 npm run check     # tsc --noEmit，零错误
 npm test          # 57 个测试，全绿（含 1 份真机 golden transcript 回放）
-npm run demo      # 离线：4 个确定性场景 + 回放恢复
+npm run demo      # 离线：5 个确定性场景（含上下文压缩）+ 回放恢复
+npm run serve     # SSE 端点（需要模型：--endpoint 或 provider 凭证）
 ```
+
+要求 **Node >= 24**：本项目用 Node 原生执行 `.ts`（无构建步骤），而 24 是唯一实测过的版本。
+CI 也只跑 24 —— 声称两个版本却只测一个，是空头承诺。
 
 真实模型的路径。**零凭证的本地端点已验证**（见第 7 节与 `docs/live-run-notes.md`）：
 
@@ -56,6 +60,19 @@ curl -N "http://127.0.0.1:8787/run?request=..."
 
 模型不支持 tool calling 时加 `--tools none`：这是一条**文字模式**通道，用来隔离
 "传输/解码/usage"与"工具调用"两件事——本项目的 usage 就是这样第一次被真机验证的。
+
+## 4.1 工程状态
+
+| 项 | 状态 |
+|---|---|
+| 版本控制 | git 仓库；首次提交 49 files / 7 878 insertions，提交信息含完整设计理由 |
+| 许可证 | MIT（见 `LICENSE`）—— 这是**默认选择**，如需专利授权条款请改 Apache-2.0 |
+| CI | `.github/workflows/ci.yml`：`npm ci` → typecheck → 57 tests → demo |
+| npm scripts | `test` / `check` / `demo` / `replay` / `serve` / `record` |
+| 仓库范围 | 只含本项目；与本项目无关的第三方技能包已在 `.gitignore` 排除 |
+
+> 注：仓库级 git 身份是占位值（`TinyCode <tinycode@localhost.invalid>`），
+> 因为你机器上没有配置全局身份。首次推送前请改成你自己的。
 
 ## 5. 退出准则 → 真实命令
 
