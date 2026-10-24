@@ -31,7 +31,7 @@ Task → Context → 模型决策 → 工具动作 → Observation → 状态更
 ```bash
 npm install
 npm run check     # tsc --noEmit，零错误
-npm test          # 57 个测试，全绿（含 1 份真机 golden transcript 回放）
+npm test          # 68 个测试，全绿（含 1 份真机 golden transcript 回放）
 npm run demo      # 离线：5 个确定性场景（含上下文压缩）+ 回放恢复
 npm run serve     # SSE 端点（需要模型：--endpoint 或 provider 凭证）
 ```
@@ -74,6 +74,55 @@ curl -N "http://127.0.0.1:8787/run?request=..."
 > 注：仓库级 git 身份是占位值（`TinyCode <tinycode@localhost.invalid>`），
 > 因为你机器上没有配置全局身份。首次推送前请改成你自己的。
 
+## 4.2 桌面应用（Electron）
+
+同一套 Core/Runtime，包在 Electron 里：**Runtime 跑在主进程**（Pi SDK 是 Node 包），
+renderer 只接收通过 IPC 推来的产品级事件。Core/Runtime/adapters **一行未改** —— 这是端口架构的回报。
+
+```
+src/main/index.ts              BrowserWindow + 安全配置 + CSP
+src/main/ipc/run-handlers.ts   托管 Runtime，把事件推给 renderer
+src/preload/index.ts           contextBridge，只暴露具名 channel
+src/renderer/src/App.tsx       打字机正文 / 工具轨迹 / 成本 / 终态
+src/renderer/src/view-model.ts 纯 reducer：事件 → 可见状态
+src/shared/ipc.ts              IPC 契约（三端共享）
+```
+
+```bash
+npm run dev:desktop     # 开发模式（HMR）
+npm run build:desktop   # 产出 out/
+```
+
+### 三个被迫的格式决定（每一条都有实测理由，不是偏好）
+
+| 决定 | 理由 |
+|---|---|
+| main 必须是 **CJS**（`index.cjs`） | 实测：Electron 33 / Node 20.18.3 下，ESM main 连 `import { app } from "electron"` 都会崩 |
+| preload 必须是 **CJS**（`index.cjs`） | `sandbox: true` 的 preload 不能是 ESM |
+| `pi-ai` 在适配器里**只做类型 import** | 它是纯 ESM 包，CJS 的 `require()` 会 `ERR_PACKAGE_PATH_NOT_EXPORTED`；运行时访问全部走动态 `import()` |
+
+### 一个环境坑（值得记）
+
+如果 shell 里有 `ELECTRON_RUN_AS_NODE=1`，Electron 会以**纯 Node 模式**启动：
+`process.type` 是 `undefined`、`require("electron")` 返回 exe 路径字符串而非 API。
+启动前请先 `unset ELECTRON_RUN_AS_NODE`，否则会得到一堆看不懂的互操作报错。
+
+### ⚠️ 启动**未**在本环境验证
+
+构建通过、三端类型检查通过、11 个新测试通过 —— 但**我没有成功把窗口拉起来**：
+
+```
+直接启动             exit -2147483645 (0x80000003 STATUS_BREAKPOINT)
+--no-sandbox --disable-gpu  exit -1073741819 (0xC0000005 STATUS_ACCESS_VIOLATION)
+```
+
+两次都是 OS 级崩溃，发生在**我的应用代码执行之前**，也无任何 stdout/stderr ——
+这是我的执行环境不允许 Chromium 多进程模型的限制，不是代码错误的证据。
+**请在你自己桌面的终端里跑 `npm run dev:desktop` 验证。**
+
+已静态验证的部分（`test/desktop-security.test.ts`，5 个测试）：
+安全三默认齐全、禁止导航/开窗、CSP 存在、preload 不暴露裸 `ipcRenderer`、
+所有 IPC 走具名 channel、preload 不碰 node 内置模块、renderer 不碰 SDK 与文件系统。
 ## 5. 退出准则 → 真实命令
 
 每一条都对应一个真跑过的测试；跑不过就不算完成。
@@ -92,7 +141,7 @@ curl -N "http://127.0.0.1:8787/run?request=..."
 | 10 | `usage_reported` 回答每次 run 的成本问题 | `a run has an ordered lifecycle...`（断言每次 run 都有 usage_reported）+ `real adapter decodes a text stop into respond and reports usage` |
 | 11 | 密钥不出现在事件、trace、日志里 | `our code never reads credentials: the SDK auth store owns them` |
 
-`npm test` 是唯一的验收入口：57 pass / 0 fail。
+`npm test` 是唯一的验收入口：68 pass / 0 fail。
 
 对照 skill 全部 13 个参考文件的逐条审计见 `docs/skill-audit.md`：
 24 条有约束力的要求 —— 合规 15、已修偏离 1、有意偏离 2（附实测依据）、不适用 6（附架构理由）。

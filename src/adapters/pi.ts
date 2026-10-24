@@ -2,16 +2,19 @@ import { spawn } from "node:child_process";
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 
-import {
-  Type,
-  type Api,
-  type AssistantMessage,
-  type Context,
-  type Message,
-  type Model,
-  type Models,
-  type Tool as PiTool,
-  type ToolCall,
+// `@earendil-works/pi-ai` is ESM-only, and this file is loaded inside the Electron
+// main process, which must be a CJS bundle. A CJS require() of an ESM-only package
+// fails with ERR_PACKAGE_PATH_NOT_EXPORTED, so this import is TYPES ONLY and every
+// runtime access goes through dynamic import() (which bridges CJS -> ESM).
+import type {
+  Api,
+  AssistantMessage,
+  Context,
+  Message,
+  Model,
+  Models,
+  Tool as PiTool,
+  ToolCall,
 } from "@earendil-works/pi-ai";
 
 import { TOOL_SPECS, stringArg, truncate, type ToolSpec } from "../core/policy.ts";
@@ -45,7 +48,9 @@ export function toPiTool(spec: ToolSpec): PiTool {
   return {
     name: spec.name,
     description: spec.description,
-    parameters: Type.Unsafe(spec.parameters),
+    // Type.Unsafe(schema) is the identity for an already-valid JSON Schema; using the
+    // cast instead keeps this file free of a runtime SDK import.
+    parameters: spec.parameters as unknown as PiTool["parameters"],
   };
 }
 

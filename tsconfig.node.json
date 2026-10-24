@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": [
+      "ES2023"
+    ],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/core/**/*.ts",
+    "src/runtime/**/*.ts",
+    "src/adapters/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/main/**/*.ts",
+    "src/preload/**/*.ts",
+    "src/cli.ts",
+    "src/serve.ts",
+    "test/**/*.ts",
+    "scripts/**/*.ts",
+    "electron.vite.config.ts"
+  ],
+  "exclude": [
+    "src/renderer/**"
+  ]
+}

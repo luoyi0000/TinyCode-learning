@@ -1,6 +1,9 @@
 node_modules/
 *.log
 
+# Electron build output
+out/
+
 # run artefacts (event logs, run records); fixtures live in transcripts/
 .tinycode/
 

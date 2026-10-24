@@ -1,0 +1,40 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #0f1115; color: #e6e8ee;
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.shell { display: flex; flex-direction: column; height: 100vh; padding: 14px; gap: 12px; }
+.head { display: flex; align-items: baseline; gap: 12px; }
+.head h1 { margin: 0; font-size: 18px; letter-spacing: .3px; }
+.sub { color: #8b93a7; font-size: 12px; }
+.form { display: flex; flex-direction: column; gap: 8px; }
+textarea, input { background: #171a21; color: #e6e8ee; border: 1px solid #262b36;
+  border-radius: 6px; padding: 7px 9px; font: inherit; width: 100%; }
+textarea { resize: vertical; }
+.row { display: grid; grid-template-columns: 1.6fr 1fr 1.4fr .8fr; gap: 8px; }
+.row label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #8b93a7; }
+.actions { display: flex; align-items: center; gap: 8px; }
+button { background: #1d2230; color: #cdd3e1; border: 1px solid #2b3242;
+  border-radius: 6px; padding: 7px 16px; font: inherit; cursor: pointer; }
+button:hover:not(:disabled) { background: #242b3c; }
+button:disabled { opacity: .45; cursor: default; }
+button.primary { background: #2b6cff; border-color: #2b6cff; color: #fff; }
+.notice { color: #ffb86b; font-size: 12px; }
+.panes { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 0; }
+.pane { display: flex; flex-direction: column; min-height: 0;
+  background: #13161c; border: 1px solid #222834; border-radius: 8px; padding: 10px; }
+.pane h2 { margin: 0 0 8px; font-size: 11px; font-weight: 600; color: #8b93a7;
+  text-transform: uppercase; letter-spacing: .08em; }
+.body { flex: 1; overflow: auto; margin: 0; white-space: pre-wrap; word-break: break-word; }
+.trace { flex: 1; overflow: auto; margin: 0; padding: 0; list-style: none; font-size: 12px; }
+.trace li { padding: 2px 0; border-bottom: 1px solid #1b2029; display: flex; gap: 8px; }
+.seq { color: #5a6478; font-variant-numeric: tabular-nums; flex: 0 0 28px; }
+.tone-good { color: #7ee0a8; }
+.tone-bad { color: #ff7b72; }
+.tone-warn { color: #ffb86b; }
+.verdict { display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border-radius: 8px; background: #13161c; border: 1px solid #222834; font-size: 13px; }
+.verdict.ok { border-color: #2c6b46; }
+.verdict.warn { border-color: #6b4a2c; }
+.missing { color: #ffb86b; }
+.idle { color: #8b93a7; }
+.cost { margin-left: auto; color: #8b93a7; font-variant-numeric: tabular-nums; }

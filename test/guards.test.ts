@@ -111,11 +111,18 @@ test("the SDK is imported in exactly one file: the Pi adapter", async () => {
 });
 
 test("our code never reads credentials: the SDK auth store owns them", async () => {
+  // The invariant is about CREDENTIALS, not about env access in general: the Electron
+  // main process legitimately reads ELECTRON_RENDERER_URL. Reading an API key is what
+  // must never happen here -- the SDK's auth layer owns that.
   const root = resolve(process.cwd(), "src");
   const files = await walk(root);
   for (const file of files) {
     const text = await readFile(file, "utf8");
-    assert.equal(/process\.env\b/.test(text), false, "process.env read in " + file);
+    assert.equal(
+      /process\.env\.[A-Z0-9_]*(_KEY|_TOKEN|_SECRET|_PASSWORD)/.test(text),
+      false,
+      "credential env read in " + file,
+    );
     assert.equal(/sk-[A-Za-z0-9]{16,}/.test(text), false, "secret literal in " + file);
   }
 });

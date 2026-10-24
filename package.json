@@ -5,16 +5,19 @@
   "description": "A tiny coding agent: Core/Runtime separated, Pi Agent SDK behind ports",
   "license": "MIT",
   "type": "module",
+  "main": "./out/main/index.cjs",
   "engines": {
     "node": ">=24.0.0"
   },
   "scripts": {
     "test": "node --test",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "demo": "node src/cli.ts demo",
     "replay": "node src/cli.ts replay",
     "serve": "node src/cli.ts serve",
-    "record": "node scripts/record.ts"
+    "record": "node scripts/record.ts",
+    "dev:desktop": "electron-vite dev",
+    "build:desktop": "electron-vite build"
   },
   "dependencies": {
     "@earendil-works/pi-coding-agent": "0.84.2",
@@ -22,6 +25,14 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "@types/node": "^22.18.0"
+    "@types/node": "^22.18.0",
+    "electron": "^33.2.0",
+    "electron-vite": "^2.3.0",
+    "vite": "^5.4.11",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
   }
 }
