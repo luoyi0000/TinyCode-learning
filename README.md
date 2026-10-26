@@ -126,7 +126,42 @@ npm run build:desktop   # 产出 out/
 **结论：同一台机器、同一个二进制，从 OneDrive 同步目录里启动就 `EXIT=3`，从本地盘启动就正常。**
 OneDrive 的文件系统过滤驱动让 Electron 连自己的 DLL 都加载不起来。
 
-**修复：把项目移出 OneDrive。**
+### 修复方案 A（推荐）：把项目移出 OneDrive
+
+```powershell
+mkdir C:\Users\<你>\Projects
+Move-Item C:\Users\<你>\OneDrive\Desktop\TinyCode C:\Users\<你>\Projects\TinyCode
+cd C:\Users\<你>\Projects\TinyCode
+npm install        # 重新装依赖：OneDrive 下装出来的 node_modules 不可信
+npm run dev:desktop
+```
+
+> `node_modules` 和 `.git` 放在 OneDrive 里本来就是坏组合——同步冲突、`.git` 损坏、
+> 过滤驱动干扰都是常见事故。代码用 git 远端备份，不要用 OneDrive。
+
+### 修复方案 B（不搬项目）：让二进制待在本地盘
+
+更精确的结论：坏的不是「从 OneDrive 读 JS」，而是「**从 OneDrive 加载 Electron 自己的 DLL**」。
+`electron/index.js` 支持 `ELECTRON_OVERRIDE_DIST_PATH`，所以把二进制放本地、源码留 OneDrive 就行。
+**已实测通过**：窗口正常 `ready-to-show`。
+
+```powershell
+node scripts/repair-electron.mjs      # 会打印下面这行所需的路径
+$env:ELECTRON_OVERRIDE_DIST_PATH = "C:\Users\<你>\AppData\Local\tinycode-electron-dist"
+npm run dev:desktop
+```
+
+### 还有一个我自己造的坑（已修）
+
+网络受限时 Electron 的 `install.js` 会失败，我手工从缓存解压，然后写了
+`path.txt` = `dist/electron.exe` —— 这是错的：
+
+- `index.js` 做的是 `path.join(__dirname, 'dist', <path.txt>)`，带 `dist/` 前缀会拼成 `dist/dist/`
+- `echo ... >` 还会在文件名末尾留一个 `\n`，于是报 `ENOENT ...\dist\dist\electron.exe\n`
+
+`path.txt` 必须**正好**是 `electron.exe`。`scripts/repair-electron.mjs` 现在会处理它，
+并在必要时从 `%LOCALAPPDATA%/electron/Cache` 的 zip 解压（不需要联网）。
+
 
 ```powershell
 mkdir C:\Users\<你>\Projects
