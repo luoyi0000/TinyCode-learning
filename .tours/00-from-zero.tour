@@ -1,0 +1,85 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "TinyCode 从零开始：13 步读懂一个 Agent",
+  "description": "给第一次读这个项目的人。顺序是刻意的：先看结局与判定规则，再看执行与适配器。每一步都问自己：为什么是这样写的？",
+  "steps": [
+    {
+      "file": "README.md",
+      "line": 7,
+      "title": "起点：一句话的真实任务",
+      "description": "不要先看代码。先读这句任务陈述——项目里每个设计决定都能追回到它。「已落盘、自带证据」「做不到必须报 partial」是全部设计的源头。"
+    },
+    {
+      "file": "src/core/types.ts",
+      "line": 26,
+      "title": "Agent 只有三种结局",
+      "description": "Decision 是个三选一的联合类型：respond（回答）/ call_tool（动手）/ ask_human（问人）。整个 agent 的能力边界就是这三个分支——加任何功能前先问：它属于哪一支？"
+    },
+    {
+      "file": "src/core/types.ts",
+      "line": 137,
+      "title": "两个端口：Agent 与外部世界的全部接口",
+      "description": "ModelPort 只要一个 decide()，ToolPort 只要一个 execute()。注意 signal 是必填参数——取消能力不靠自觉，靠类型系统强制。SDK 的形状一点都没漏进来。"
+    },
+    {
+      "file": "src/core/loop.ts",
+      "line": 32,
+      "title": "★ 项目的良心：什么算「完成」",
+      "description": "finalVerdict 只有 20 行，是整个项目最重要的函数。两条规则：没有 observation 不算完成；改过文件必须有写后通过的检查。先读它，再看别的。"
+    },
+    {
+      "file": "src/core/loop.ts",
+      "line": 66,
+      "title": "唯一的状态转移",
+      "description": "applyToolStep 是纯函数：(旧状态, 决策, 观察) → 新状态。注意它也负责把写文件后的旧 check 作废——陈旧证据是最隐蔽的假成功来源。"
+    },
+    {
+      "file": "src/runtime/events.ts",
+      "line": 15,
+      "title": "13 种产品级事件",
+      "description": "这是 Runtime 对外的唯一契约。CLI、SSE、run log、测试都只消费这些事件，原始 SDK 回调永远出不了 Runtime。text_delta 标注了「瞬态」——只进实时流，不进日志。"
+    },
+    {
+      "file": "src/runtime/events.ts",
+      "line": 82,
+      "title": "为什么 sequence 要到「发射」时才编号",
+      "description": "stage 记时间、publish 编号。如果创建时就编号，工具事件会拿到比决策事件更小的号，日志就自相矛盾了。这是异步执行顺序与逻辑顺序的经典冲突。"
+    },
+    {
+      "file": "src/runtime/run.ts",
+      "line": 238,
+      "title": "主循环：检查顺序就是语义",
+      "description": "迭代预算 → 工具预算 → 上下文压缩 → token 上限 → 才请求模型。顺序不能换：先发 model_requested 再查预算，日志里就会出现「请求了却什么都没发生」的假事件。"
+    },
+    {
+      "file": "src/runtime/runlog.ts",
+      "line": 85,
+      "title": "回放：为什么它不会漂移",
+      "description": "replayAgentState 只认两种事件，并且复用 loop.ts 的 applyToolStep。如果回放自己重推一遍，两边会慢慢分叉且都「看起来对」——共用函数让漂移在构造上不可能。"
+    },
+    {
+      "file": "src/adapters/pi.ts",
+      "line": 111,
+      "title": "适配器的真正工作：翻译脏东西",
+      "description": "各家 provider 的错误千奇百怪，mapProviderError 把它们归一成 10 个 RunErrorCode 之一，并标出可否重试。402 余额不足、401 凭证、429 限流在这里分道扬镳。"
+    },
+    {
+      "file": "src/adapters/fake.ts",
+      "line": 15,
+      "title": "假适配器：让语义可以离线验证",
+      "description": "createScriptedModel 只是按顺序吐决策。它存在的意义不是「模拟真实」，而是确定性——Core 的全部语义都能在无网络、无进程的情况下被证明。"
+    },
+    {
+      "file": "test/guards.test.ts",
+      "line": 102,
+      "title": "把架构约束写成测试",
+      "description": "「SDK 只许在一个文件里 import」——这句话写在注释里没用，写成测试才有用。它后来真的抓到了有人在 cli.ts 里偷懒。"
+    },
+    {
+      "file": "docs/live-run-notes.md",
+      "line": 155,
+      "title": "★ 收尾：离线全绿不等于正确",
+      "description": "读事实 9 和 10。真机跑了四次，推翻了判定规则两次。假脚本永远会调工具、永远会跑 check——离线测试验证的是你想到的情况。这是整个项目最值钱的一条经验。"
+    }
+  ]
+}
