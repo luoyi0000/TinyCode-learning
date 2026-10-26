@@ -1,3 +1,7 @@
+// MUST be the first import: its side effects have to run before the electron require
+// below, otherwise a failure inside that require leaves no trace at all.
+import { trace } from "./diagnostics.ts";
+
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -57,7 +61,22 @@ function createWindow(): BrowserWindow {
     },
   });
 
-  win.once("ready-to-show", () => win.show());
+  win.once("ready-to-show", () => {
+    trace("window ready-to-show");
+    win.show();
+  });
+
+  // Silent failures live here: a preload that throws does not crash the app, it just
+  // leaves window.tinycode undefined and every button dead.
+  win.webContents.on("preload-error", (_event, preloadPath, error) => {
+    trace("preload-error", { preloadPath, message: error.message });
+  });
+  win.webContents.on("did-fail-load", (_event, code, description, url) => {
+    trace("did-fail-load", { code, description, url });
+  });
+  win.webContents.on("render-process-gone", (_event, details) => {
+    trace("render-process-gone", details);
+  });
 
   // Never let the renderer navigate away or spawn windows.
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -79,10 +98,12 @@ function createWindow(): BrowserWindow {
 }
 
 void app.whenReady().then(() => {
+  trace("app ready", { appPath: app.getAppPath(), preload: resolvePreload() });
   applyCsp();
   const logDir = join(app.getPath("userData"), "runs");
   registerRunHandlers(() => BrowserWindow.getAllWindows()[0]!.webContents, logDir);
   createWindow();
+  trace("window created");
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -90,5 +111,6 @@ void app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  trace("window-all-closed");
   if (process.platform !== "darwin") app.quit();
 });
