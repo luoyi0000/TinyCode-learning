@@ -31,7 +31,7 @@ Task → Context → 模型决策 → 工具动作 → Observation → 状态更
 ```bash
 npm install
 npm run check     # tsc --noEmit，零错误
-npm test          # 68 个测试，全绿（含 1 份真机 golden transcript 回放）
+npm test          # 74 个测试，全绿（含 1 份真机 golden transcript 回放）
 npm run demo      # 离线：5 个确定性场景（含上下文压缩）+ 回放恢复
 npm run serve     # SSE 端点（需要模型：--endpoint 或 provider 凭证）
 ```
@@ -81,7 +81,9 @@ renderer 只接收通过 IPC 推来的产品级事件。Core/Runtime/adapters **
 
 ```
 src/main/index.ts              BrowserWindow + 安全配置 + CSP
-src/main/ipc/run-handlers.ts   托管 Runtime，把事件推给 renderer
+src/main/workspace.ts          工作区守卫（纯函数，无 electron）
+src/main/run-bridge.ts         executeRun：执行 + 推事件（纯，无 electron）
+src/main/ipc/run-handlers.ts   薄壳：只接 IPC、解析模型、调用上面两个
 src/preload/index.ts           contextBridge，只暴露具名 channel
 src/renderer/src/App.tsx       打字机正文 / 工具轨迹 / 成本 / 终态
 src/renderer/src/view-model.ts 纯 reducer：事件 → 可见状态
@@ -120,7 +122,13 @@ npm run build:desktop   # 产出 out/
 这是我的执行环境不允许 Chromium 多进程模型的限制，不是代码错误的证据。
 **请在你自己桌面的终端里跑 `npm run dev:desktop` 验证。**
 
-已静态验证的部分（`test/desktop-security.test.ts`，5 个测试）：
+**能验证的部分我做到了尽量深**——把 Electron 依赖从业务逻辑里剥出来之后：
+
+- `test/desktop-ipc.test.ts`（6 个测试）**在普通 Node 里跑真实链路**：
+  工作区空值落到 userData 沙箱、指向应用目录被拒绝、显式目录被创建、
+  **每个产品事件按序到达 renderer 且以终态收尾**、取消报 `run_cancelled` 而非完成、
+  运行时启动失败仍会给 UI 一个终态（不会让界面挂着）。
+- `test/desktop-security.test.ts`（5 个测试）静态断言安全姿态：
 安全三默认齐全、禁止导航/开窗、CSP 存在、preload 不暴露裸 `ipcRenderer`、
 所有 IPC 走具名 channel、preload 不碰 node 内置模块、renderer 不碰 SDK 与文件系统。
 ## 5. 退出准则 → 真实命令
@@ -141,7 +149,7 @@ npm run build:desktop   # 产出 out/
 | 10 | `usage_reported` 回答每次 run 的成本问题 | `a run has an ordered lifecycle...`（断言每次 run 都有 usage_reported）+ `real adapter decodes a text stop into respond and reports usage` |
 | 11 | 密钥不出现在事件、trace、日志里 | `our code never reads credentials: the SDK auth store owns them` |
 
-`npm test` 是唯一的验收入口：68 pass / 0 fail。
+`npm test` 是唯一的验收入口：74 pass / 0 fail。
 
 对照 skill 全部 13 个参考文件的逐条审计见 `docs/skill-audit.md`：
 24 条有约束力的要求 —— 合规 15、已修偏离 1、有意偏离 2（附实测依据）、不适用 6（附架构理由）。
