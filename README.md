@@ -109,28 +109,53 @@ npm run build:desktop   # 产出 out/
 `process.type` 是 `undefined`、`require("electron")` 返回 exe 路径字符串而非 API。
 启动前请先 `unset ELECTRON_RUN_AS_NODE`，否则会得到一堆看不懂的互操作报错。
 
-### ⚠️ 启动**未**在本环境验证
+### 启动问题已定位：**是 OneDrive 目录，不是代码**
 
-构建通过、三端类型检查通过、11 个新测试通过 —— 但**我没有成功把窗口拉起来**：
+第一次 `npm run dev:desktop` 的现象是：main/preload 构建成功、dev server 起来了、
+`start electron app...` 之后进程静默消失，零报错。
 
+定位过程（每一步都是实测）：
+
+| 步骤 | 结果 |
+|---|---|
+| 最小 10 行 Electron 应用 | 同样静默退出，日志文件从未被创建 → **JS 一行都没执行** |
+| `electron.exe --version`（项目路径） | `EXIT=3`，stdout/stderr 全空 |
+| 同一个 `electron.exe` 复制到 `%LOCALAPPDATA%\Temp` 再跑 | **`EXIT=0`，打印 `v43.3.0`** |
+| 整个应用从本地副本启动 | `boot` → `app ready` → `window created` → **`window ready-to-show`** |
+
+**结论：同一台机器、同一个二进制，从 OneDrive 同步目录里启动就 `EXIT=3`，从本地盘启动就正常。**
+OneDrive 的文件系统过滤驱动让 Electron 连自己的 DLL 都加载不起来。
+
+**修复：把项目移出 OneDrive。**
+
+```powershell
+mkdir C:\Users\<你>\Projects
+Move-Item C:\Users\<你>\OneDrive\Desktop\TinyCode C:\Users\<你>\Projects\TinyCode
+cd C:\Users\<你>\Projects\TinyCode
+npm install        # 重新装依赖（OneDrive 下装出来的 node_modules 不可信）
+npm run dev:desktop
 ```
-直接启动             exit -2147483645 (0x80000003 STATUS_BREAKPOINT)
---no-sandbox --disable-gpu  exit -1073741819 (0xC0000005 STATUS_ACCESS_VIOLATION)
+
+> 顺带建议：`node_modules` 和 `.git` 放在 OneDrive 里本来就是坏组合——
+> 同步冲突、`.git` 损坏、过滤驱动干扰都是常见事故。代码用 git 远端备份，不要用 OneDrive。
+
+### 一个我走错的弯，记在这里
+
+中途我把 Electron 从 33 升到了 43，理由是对比时发现「DSH 用的 Electron 43 能跑、我们的 33 不能」。
+**那个对比是被 OneDrive 混淆的**——两个二进制不在同一个路径类型下，版本不是变量。
+很可能 33 从本地盘也是好的。
+
+保留 43 的理由只剩两条真实收益：它和 `engines: node>=24` 对齐（43 内置 Node 24），
+且它是这台机器上**已被证明能启动**的版本。不是什么「33 坏了」。
+
+如果 `npm install` 时 Electron 二进制下载失败（网络受限），可以从本机缓存解压：
+
+```bash
+ZIP="$LOCALAPPDATA/electron/Cache/*/electron-v43.3.0-win32-x64.zip"
+mkdir -p node_modules/electron/dist
+unzip -q $ZIP -d node_modules/electron/dist
+echo "dist/electron.exe" > node_modules/electron/path.txt
 ```
-
-两次都是 OS 级崩溃，发生在**我的应用代码执行之前**，也无任何 stdout/stderr ——
-这是我的执行环境不允许 Chromium 多进程模型的限制，不是代码错误的证据。
-**请在你自己桌面的终端里跑 `npm run dev:desktop` 验证。**
-
-**能验证的部分我做到了尽量深**——把 Electron 依赖从业务逻辑里剥出来之后：
-
-- `test/desktop-ipc.test.ts`（6 个测试）**在普通 Node 里跑真实链路**：
-  工作区空值落到 userData 沙箱、指向应用目录被拒绝、显式目录被创建、
-  **每个产品事件按序到达 renderer 且以终态收尾**、取消报 `run_cancelled` 而非完成、
-  运行时启动失败仍会给 UI 一个终态（不会让界面挂着）。
-- `test/desktop-security.test.ts`（5 个测试）静态断言安全姿态：
-安全三默认齐全、禁止导航/开窗、CSP 存在、preload 不暴露裸 `ipcRenderer`、
-所有 IPC 走具名 channel、preload 不碰 node 内置模块、renderer 不碰 SDK 与文件系统。
 ## 5. 退出准则 → 真实命令
 
 每一条都对应一个真跑过的测试；跑不过就不算完成。
