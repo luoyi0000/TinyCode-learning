@@ -139,18 +139,31 @@ npm run dev:desktop
 > `node_modules` 和 `.git` 放在 OneDrive 里本来就是坏组合——同步冲突、`.git` 损坏、
 > 过滤驱动干扰都是常见事故。代码用 git 远端备份，不要用 OneDrive。
 
-### 修复方案 B（不搬项目）：让二进制待在本地盘
+### 修复方案 B（不搬项目）：把 dist 做成指向本地盘的 junction
 
 更精确的结论：坏的不是「从 OneDrive 读 JS」，而是「**从 OneDrive 加载 Electron 自己的 DLL**」。
-`electron/index.js` 支持 `ELECTRON_OVERRIDE_DIST_PATH`，所以把二进制放本地、源码留 OneDrive 就行。
-**已实测通过**：窗口正常 `ready-to-show`。
 
-```powershell
-node scripts/repair-electron.mjs      # 会打印下面这行所需的路径
-$env:ELECTRON_OVERRIDE_DIST_PATH = "C:\Users\<你>\AppData\Local\tinycode-electron-dist"
+**`ELECTRON_OVERRIDE_DIST_PATH` 不管用** —— 我一开始以为它能救场，实测无效：
+electron-vite 不用 `require('electron')` 的返回值，它直接拼
+`node_modules/electron/dist/electron.exe` 去 spawn。
+
+**目录 junction 管用**，因为它让那个确切路径本身解析到本地盘。**已实测通过**：
+Electron 起了 4 个进程，`boot → app ready → window created → window ready-to-show`。
+
+```cmd
+cd /d C:\Users\<你>\OneDrive\Desktop\TinyCode
+node scripts\repair-electron.mjs
 npm run dev:desktop
 ```
 
+脚本做四件事，且**可重复运行**：
+
+1. 若 `dist` 已是 junction，先 `rmdir` 断链（**不能穿过链接删或复制**——我第一版就栽在这）
+2. 确保本地副本有真二进制；缺则从 `%LOCALAPPDATA%/electron/Cache` 的 zip 解压（不需联网）
+3. 写对 `path.txt`（正文见下）
+4. 路径含 `onedrive` 时，把 `dist` 换成 junction
+
+> 每次 `npm install` 会重建 `dist`，**之后要再跑一次这个脚本**。
 ### 还有一个我自己造的坑（已修）
 
 网络受限时 Electron 的 `install.js` 会失败，我手工从缓存解压，然后写了
